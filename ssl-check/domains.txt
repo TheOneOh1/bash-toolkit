@@ -1,0 +1,3 @@
+git-scm.com
+github.com
+sonarsource.com

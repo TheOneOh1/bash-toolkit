@@ -1,0 +1,123 @@
+﻿#!/bin/bash
+
+set -euo pipefail
+
+DRY_RUN=true
+
+usage() {
+    echo "docker-reaper - Cleanup stopped containers, dangling images, and orphaned volumes"
+    echo ""
+    echo "Usage:"
+    echo "  docker-reaper           # Dry run (default)"
+    echo "  docker-reaper --force   # Actually delete"
+    echo "  docker-reaper --help"
+    exit 0
+}
+
+check_docker() {
+    if ! command -v docker >/dev/null 2>&1; then
+        echo "Error: docker command not found."
+        exit 1
+    fi
+
+    if ! docker info >/dev/null 2>&1; then
+        echo "Error: Docker daemon not accessible."
+        exit 1
+    fi
+}
+
+print_section() {
+    echo "------------------------------------------------"
+    echo "$1"
+    echo "------------------------------------------------"
+}
+
+cleanup_containers() {
+    print_section "Stopped Containers"
+
+    containers=$(docker ps -aq -f status=exited)
+
+    if [ -z "$containers" ]; then
+        echo "No stopped containers found."
+        return
+    fi
+
+    echo "$containers"
+
+    if [ "$DRY_RUN" = false ]; then
+        docker rm $containers
+    else
+        echo "[Dry Run] No containers removed."
+    fi
+}
+
+cleanup_images() {
+    print_section "Dangling Images"
+
+    images=$(docker images -f dangling=true -q)
+
+    if [ -z "$images" ]; then
+        echo "No dangling images found."
+        return
+    fi
+
+    echo "$images"
+
+    if [ "$DRY_RUN" = false ]; then
+        docker rmi $images
+    else
+        echo "[Dry Run] No images removed."
+    fi
+}
+
+cleanup_volumes() {
+    print_section "Orphaned Volumes"
+
+    volumes=$(docker volume ls -qf dangling=true)
+
+    if [ -z "$volumes" ]; then
+        echo "No orphaned volumes found."
+        return
+    fi
+
+    echo "$volumes"
+
+    if [ "$DRY_RUN" = false ]; then
+        docker volume rm $volumes
+    else
+        echo "[Dry Run] No volumes removed."
+    fi
+}
+
+main() {
+    case "${1:-}" in
+        --force)
+            DRY_RUN=false
+            ;;
+        --help)
+            usage
+            ;;
+        "")
+            ;;
+        *)
+            echo "Invalid option: $1"
+            usage
+            ;;
+    esac
+
+    check_docker
+
+    if [ "$DRY_RUN" = true ]; then
+        echo "Running in DRY-RUN mode. No resources will be deleted."
+    else
+        echo "Running in FORCE mode. Resources will be deleted."
+    fi
+
+    cleanup_containers
+    cleanup_images
+    cleanup_volumes
+
+    echo "Cleanup completed."
+}
+
+main "$@"

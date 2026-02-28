@@ -1,0 +1,6 @@
+* text=auto
+
+# Force Unix line endings for shell scripts (prevents CRLF checkout on Windows)
+*.sh text eol=lf
+docker-reaper text eol=lf
+

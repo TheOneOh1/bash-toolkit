@@ -141,4 +141,67 @@ chmod +x docker-reaper
 ./docker-reaper --help     # show usage
 ```
 
+---
+
+## `health-check/health-check.sh` – Service health checker for Spring Boot applications
+
+**Description**  
+Checks the health of a Java Spring Boot application by verifying the port is listening and querying the /actuator/health endpoint.
+
+**Requirements**
+- **Bash**
+- **curl**
+- **ss** (for port checking, usually provided by iproute2 on Linux)
+
+**Behavior**
+- Takes service name, port, and optional host (default localhost).
+- Checks if the port is listening.
+- Queries /actuator/health endpoint, expecting HTTP 200 and "status":"UP".
+- Retries up to 5 times with 3-second intervals.
+- Exit codes: 0 (success), 1 (failure), 2 (service running but actuator not exposed).
+
+**Usage**
+
+```bash
+cd bash-scripts
+chmod +x health-check/health-check.sh
+./health-check/health-check.sh my-service 8080
+./health-check/health-check.sh my-service 8080 remote-host
+```
+
+**General syntax**
+
+```bash
+./health-check/health-check.sh <SERVICE_NAME> <PORT> [HOST]
+```
+
+---
+
+## `artifact-backup/artifact-backup.sh` – Artifact backup script
+
+**Description**  
+Backs up specified artifacts (e.g., WAR/JAR files) to a backup directory with timestamps and maintains a retention policy.
+
+**Requirements**
+- **Bash**
+- Must be run as root
+- Access to the artifact files and backup directory (/opt/artifact-backups)
+
+**Behavior**
+- Backs up a predefined list of artifacts.
+- Creates backups in /opt/artifact-backups with service subdirectories.
+- Appends timestamp to backup filenames.
+- Keeps only the last 5 backups per artifact, removing older ones.
+- Logs operations with timestamps.
+
+**Usage**
+
+```bash
+cd bash-scripts
+chmod +x artifact-backup/artifact-backup.sh
+sudo ./artifact-backup/artifact-backup.sh
+```
+
+No arguments required; the script uses a hardcoded list of artifacts.
+
 

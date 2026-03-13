@@ -204,4 +204,53 @@ sudo ./artifact-backup/artifact-backup.sh
 
 No arguments required; the script uses a hardcoded list of artifacts.
 
+---
+
+## `cli-todo/cli-todo.sh` – CLI Todo Manager
+
+**Description**  
+A command-line todo list manager that allows you to add, view, delete, and mark tasks as complete. Tasks are stored in a JSON file in your home directory.
+
+**Requirements**
+- **Bash**
+- **jq** (for JSON manipulation)
+
+**Behavior**
+- Stores tasks in `~/.todo_list.json` as a JSON array.
+- Each task has an ID, description, and completion status.
+- Commands: `add`, `delete`, `complete`, `view`.
+- Validates inputs and provides error messages.
+- Logs operations with timestamps.
+
+**Usage**
+
+```bash
+cd bash-toolkit
+chmod +x cli-todo/cli-todo.sh
+./cli-todo/cli-todo.sh add "Buy groceries"
+./cli-todo/cli-todo.sh view
+./cli-todo/cli-todo.sh complete 1
+./cli-todo/cli-todo.sh delete 1
+```
+
+**General syntax**
+
+```bash
+./cli-todo/cli-todo.sh <command> [arguments]
+```
+
+Where `<command>` is one of:
+- `add "description"`: Add a new task
+- `delete <ID>`: Delete task by ID
+- `complete <ID>`: Mark task as completed
+- `view`: List all tasks
+
+**Example output for `view`**
+
+```text
+ID  STATUS  DESCRIPTION
+1   [ ]     Buy groceries
+2   [x]     Finish report
+```
+
 

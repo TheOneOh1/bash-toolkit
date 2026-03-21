@@ -350,3 +350,39 @@ chmod +x secret-scan/secret-scan.sh
 [INFO] Files scanned   : 42
 [WARN] Findings        : 2 potential secret(s) in 1 file(s)
 ```
+
+---
+
+## `sys-snapshot/sys-snapshot.sh` – Point-in-time system state capture
+
+**Description**  
+Takes a point-in-time snapshot of CPU usage, memory, top 20 processes, disk I/O, disk usage, open file descriptors, and network connections. Useful for capturing system state during incidents or performance investigations. Output goes to both terminal and a timestamped file.
+
+**Requirements**
+- **Bash**
+- **Linux** (uses `/proc` filesystem, `free`, `ps`, `df`, etc.)
+- Optional: `mpstat`, `iostat` (from `sysstat` package) for richer CPU/disk stats
+
+**Behavior**
+- Captures uptime, CPU breakdown, memory usage, top 20 processes by CPU, disk I/O stats, disk usage, open file descriptor counts, and network connection summary.
+- Outputs everything to the terminal AND saves a clean (ANSI-stripped) copy to a timestamped file like `snapshot_20260321_140000.txt`.
+- Gracefully skips sections when optional tools (`mpstat`, `iostat`) aren't installed.
+
+**Usage**
+
+```bash
+cd bash-toolkit-1
+chmod +x sys-snapshot/sys-snapshot.sh
+./sys-snapshot/sys-snapshot.sh
+./sys-snapshot/sys-snapshot.sh --output-dir /tmp/snapshots
+```
+
+**General syntax**
+
+```bash
+./sys-snapshot/sys-snapshot.sh [options]
+```
+
+**Options**
+- `--output-dir <path>`: Directory to save the snapshot file (Default: current directory).
+- `-h, --help`: Show help.
